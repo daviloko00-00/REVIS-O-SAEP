@@ -1,0 +1,7 @@
+RF: Gerenciamento de acessos de uma oficina mecânica
+1. O sistema deve permitir autenticação de usuários;
+2. O sistema deve permitir o registro de clientes;
+3. O sistema deve permitir os registros de veículos;
+4. O sistema deve permitir associar o cliente com seu veículo;
+5. O sistema deve permitir agendar serviços com base no veículo do cliente. descrição: deve ser obrigatório descrever o serviço realizado.
+6. O sistema deve permitir alterar as informações do cliente;
