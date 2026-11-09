@@ -1,61 +1,91 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ClienteForm from "../components/ClienteForm";
 
+// const clientesMockados = [{
+//     id: 1,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
+// {
+//     id: 2,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
+// {
+//     id: 3,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
+// {
+//     id: 4,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
 
-const clientesMockados = [{
-    id: 1,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-{
-    id: 2,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-{
-    id: 3,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-{
-    id: 4,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-
-]
+// ]
 
 export default function ClientesPage() {
-    const [clientes, setClientes] = useState(clientesMockados);
+    const [clientes, setClientes] = useState([]);
     const [clienteEditando, setClienteEditando] = useState(null);
 
     const handleCancelarEdicao = () => {
-        setClienteEditando(null);
+        setClienteEditando();
     }
 
-    const handleSalvar = (dadosCLientes) => {
+    const handleSalvar = async (dadosCLientes) => {
         if (clienteEditando)
             setClientes(clientes => clientes.map(
                 cliente => cliente.id == clienteEditando.id ? { ...dadosCLientes, id: clienteEditando.id } : cliente
             ))
         else {
-            const novoCliente = {
-                ...dadosCLientes,
-                id: Date.now()
+
+
+            try {
+                const resposta = await fetch('http://localhost:3001/api/clientes', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosCLientes)
+                })
+
+                const data = await resposta.json();
+
+                const novoCliente = {
+                    ...dadosCLientes,
+                    id: data.id
+                }
+                setClientes(clientes => [...clientes, novoCliente])
+
+            } catch (error) {
+                console.error('Erro ao criar cliente', error);
             }
-            setClientes(clientes => [...clientes, novoCliente])
         }
-        
 
     }
+    useEffect(() => {
+            const buscaClientes = async () => {
+                try {
+                    const resposta = await fetch('http://localhost:3001/api/clientes')
+                    console.log(resposta);
+                    const data = await resposta.json()
+                    setClientes(data)
+                    
+                } catch (error) {
+                    console.error('Erro ao buscar o cliente', error)
+                }
+            }
+
+            buscaClientes();
+        }, [])
 
     return (
         <div>

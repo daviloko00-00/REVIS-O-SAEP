@@ -1,75 +1,116 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import VeiculoForm from "../components/VeiculoForm";
 
 
-const clientesMockados = [{
-    id: 1,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-{
-    id: 2,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-{
-    id: 3,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
-{
-    id: 4,
-    nome: "maycon",
-    cpf: "123.456.789-10",
-    telefone: "(19) 12345-1234",
-    email: "maycon@gmail.com"
-},
+// const clientesMockados = [{
+//     id: 1,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
+// {
+//     id: 2,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
+// {
+//     id: 3,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
+// {
+//     id: 4,
+//     nome: "maycon",
+//     cpf: "123.456.789-10",
+//     telefone: "(19) 12345-1234",
+//     email: "maycon@gmail.com"
+// },
 
-]
+// ]
 
-const veiculosMockados = [
-    {
-        id: 1,
-        placa: "ABC-1234",
-        modelo: "Palio",
-        marca: "Fiat",
-        ano: 2008,
-        clienteId: 1
-    },
-    {
-        id: 2,
-        placa: "CDE-1234",
-        modelo: "Civic",
-        marca: "Honda",
-        ano: 2011,
-        clienteId: 2
-    }
-]
+// const veiculosMockados = [
+//     {
+//         id: 1,
+//         placa: "ABC-1234",
+//         modelo: "Palio",
+//         marca: "Fiat",
+//         ano: 2008,
+//         clienteId: 1
+//     },
+//     {
+//         id: 2,
+//         placa: "CDE-1234",
+//         modelo: "Civic",
+//         marca: "Honda",
+//         ano: 2011,
+//         clienteId: 2
+//     }
+// ]
 
 export default function VeiculoPage() {
-    const [clientes, setClientes] = useState(clientesMockados);
-    const [veiculos, setVeiculos] = useState(veiculosMockados);
+    const [clientes, setClientes] = useState([]);
+    const [veiculos, setVeiculos] = useState([]);
+    const [veiculoEditando, setVeiculoEditando] = useState(null)
 
 
-    const handleSalvar = (dadosVeiculo) => {
-        const novoVeiculo ={
-            ...dadosVeiculo,
-            id: crypto.randomUUID
+    const handleSalvar = async (dadosVeiculos) => {
+        if (setVeiculoEditando)
+            setVeiculos(Veiculos => Veiculos.map(
+                veiculo => veiculo.id == veiculoEditando.id ? { ...dadosVeiculos, id: veiculoEditando.id } : veiculo))
+
+        else {
+
+            try {
+                const resposta = await fetch('http://localhost:3001/api/veiculos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(dadosVeiculos)
+                })
+
+                const data = await resposta.json();
+
+                const novoVeiculo = {
+                    ...dadosVeiculos,
+                    id: data.id
+                }
+                setVeiculos(veiculo => [...veiculo, novoVeiculo])
+
+            } catch (error) {
+                console.error('Erro ao criar cliente', error);
+            }
         }
 
-        setVeiculos( veiculos => [...veiculos, novoVeiculo])
     }
+
+    useEffect(()=>{
+        const buscaVeiculos = async () => {
+            const resposta  = await fetch('http://localhost:3001/api/veiculos');
+            const dados = await resposta.json();
+            setVeiculos(dados)
+            console.log(dados)
+        }
+        const buscaClientes = async () => {
+            const resposta  = await fetch('http://localhost:3001/api/clientes');
+            const dados = await resposta.json();
+            setClientes(dados)
+            
+        }
+        
+        buscaVeiculos();
+        buscaClientes();
+    }, [])
 
 
     return (
         <div>
-            <h3>Gerenciamento de Clientes</h3>
+            <h3>Gerenciamento de Veículos</h3>
 
             <VeiculoForm
                 clientes={clientes}
@@ -97,9 +138,7 @@ export default function VeiculoPage() {
                                     <td>{veiculo.modelo}</td>
                                     <td>{veiculo.marca}</td>
                                     <td>{veiculo.ano}</td>
-                                    <td>{clientes.map(
-                                        cliente => cliente.id == veiculo.clienteId && cliente.nome
-                                    )}</td>
+                                    <td>{veiculo.NomeCliente}</td>
                                 </tr>
                             )
                         )
