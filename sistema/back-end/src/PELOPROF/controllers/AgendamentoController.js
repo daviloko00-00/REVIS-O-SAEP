@@ -27,8 +27,8 @@ class AgendamentoController {
             const [rows] = await pool.query(sql);
             console.log(rows)
 
-            rows.forEach((row) =>{
-                const cpf_cliente =crypto.decrypt(row.CPF_CLIENTE);
+            rows.forEach((row) => {
+                const cpf_cliente = crypto.decrypt(row.CPF_CLIENTE);
                 row.CPF_CLIENTE = cpf_cliente
 
                 console.log(cpf_cliente)
@@ -48,16 +48,29 @@ class AgendamentoController {
             // }))
             return res.json(rows)
 
-        } catch (error) {
 
+
+        } catch (error) {
+            console.error('Erro ao listar agendamento', error);
+            return res.status(500).json({
+                error: "Erro ao buscar os agendamentos",
+                errorMessage: error.message
+            });
+        }
+    }
+    async criar(req, res) {
+
+        try {
+
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json(
+                {
+                    message: ' erro ao cadastrar agendamento', errorMessage: error.message
+                }
+            );
         }
 
-    } catch(error) {
-        console.error('Erro ao listar agendamento', error);
-        return res.status(500).json({
-            error: "Erro ao buscar os agendamentos",
-            errorMessage: error.message
-        });
     }
 }
 export default new AgendamentoController();

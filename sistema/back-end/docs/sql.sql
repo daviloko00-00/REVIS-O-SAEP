@@ -1,6 +1,6 @@
 select version();
-create database oficina_db;
-use oficina_db;
+create database oficina_db_i2hs;
+use oficina_db_i2hs;
 
 create table clientes(
 	id int auto_increment primary key,
