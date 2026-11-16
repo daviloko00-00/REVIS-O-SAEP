@@ -7,7 +7,7 @@ class Database {
             host: process.env.HOST || 'localhost',
             user: process.env.USER || 'root',
             password: process.env.PASSWORD || '1234',
-            database: process.env.DATABASE || 'oficina_db',
+            database: process.env.DATABASE || 'oficina_db_i2hs',
             port: process.env.PORT || '3306',
             waitForConnections: true,
             connectionLimit: 10,

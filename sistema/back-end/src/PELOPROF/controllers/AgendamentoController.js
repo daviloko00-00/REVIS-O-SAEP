@@ -59,8 +59,18 @@ class AgendamentoController {
         }
     }
     async criar(req, res) {
+        const { data_agendamento, descricao_servico, veiculo_id, status } = req.body;
+        console.log(req.body);
+
+        if (!data_agendamento || !descricao_servico || !veiculo_id)
+            res.status(400).json({ message: 'Todos os campos são obrigatórios' });
 
         try {
+            const [result] = await pool.query(
+                'INSERT INTO agendamentos (data_agendamento, descricao_servico, veiculo_id, status) VALUES (?, ?, ?, ?);', [data_agendamento, descricao_servico, parseInt(veiculo_id, 10), status || 'Agendado']
+            );
+
+            return res.status(201).json({ message: "Agendamento cadastrado com sucesso!", id: result.insertId });
 
         } catch (error) {
             console.error(error);
@@ -69,6 +79,27 @@ class AgendamentoController {
                     message: ' erro ao cadastrar agendamento', errorMessage: error.message
                 }
             );
+        }
+
+    }
+    async atualizarData(req, res) {
+        const { id } = req.params;
+        const { nova_data } = req.body;
+
+        if (!nova_data)
+            return res.status(400).json({ message: "Insira uma nova data para a atualização" });
+        try {
+            const [result] = await pool.query(`UPDATE agendamentos SET data_agendamento = ? WHERE id = ?`, [nova_data, id]);
+
+            if (result.affectedRows === 0)
+                return res.status(404).json({ error: "Agendamento não encontrado" });
+
+            return res.json({ message: " data de agendamento atualizada no sistema" })
+        } catch (error) {
+            console.error("Erro ao atualizar data de agendamento", error);
+            return res.status(500).json({
+                error: "Erro ao salvar a nova data no banco"
+            })
         }
 
     }

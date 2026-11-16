@@ -32,7 +32,7 @@ app.use((req, res) =>{
         error: 'Recurso ou rota não encontrada'
     })
 })
-const original = "12345678901";
+const original = "99705434743";
 
 const encrypted = crypto.encrypt(original);
 const decrypted = crypto.decrypt(encrypted);
